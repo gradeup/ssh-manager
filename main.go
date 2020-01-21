@@ -2,11 +2,14 @@ package main
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"time"
+
+	"sshmanager/libraries"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -33,12 +36,26 @@ func executeCmd(cmd, hostname string, config *ssh.ClientConfig) string {
 }
 
 func main() {
+	psHost := flag.String("pshost", "localhost", "Hostname of Postgres database")
+	psPort := flag.Int("psport", 5432, "Port to connect to postgres host")
+	psUser := flag.String("psuser", "postgres", "Username to connect to postgres")
+	psPassword := flag.String("pspassword", "postgres", "Password of the provided user")
+	psDatabase := flag.String("psdatabase", "database", "Database to use")
+	keyFile := flag.String("keypath", "/.ssh/id_rsa", "Relative Path of private key to use from HOME")
+
+	flag.Parse()
+
+	_, err := libraries.GetPostgresClient(*psHost, *psPort, *psUser, *psPassword, *psDatabase)
+	if err != nil {
+		panic(err)
+	}
+
 	cmd := "ls"
 	hosts := []string{}
 	results := make(chan string, 10)
 	timeout := time.After(30 * time.Second)
 
-	pemBytes, err := ioutil.ReadFile(os.Getenv("HOME") + "")
+	pemBytes, err := ioutil.ReadFile(os.Getenv("HOME") + *keyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
