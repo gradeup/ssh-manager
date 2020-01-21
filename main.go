@@ -2,14 +2,15 @@ package main
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"sshmanager/libraries"
+	"strconv"
 	"time"
 
-	"sshmanager/libraries"
+	"github.com/joho/godotenv"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -36,16 +37,24 @@ func executeCmd(cmd, hostname string, config *ssh.ClientConfig) string {
 }
 
 func main() {
-	psHost := flag.String("pshost", "localhost", "Hostname of Postgres database")
-	psPort := flag.Int("psport", 5432, "Port to connect to postgres host")
-	psUser := flag.String("psuser", "postgres", "Username to connect to postgres")
-	psPassword := flag.String("pspassword", "postgres", "Password of the provided user")
-	psDatabase := flag.String("psdatabase", "database", "Database to use")
-	keyFile := flag.String("keypath", "/.ssh/id_rsa", "Relative Path of private key to use from HOME")
 
-	flag.Parse()
+	// Load .env file
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 
-	_, err := libraries.GetPostgresClient(*psHost, *psPort, *psUser, *psPassword, *psDatabase)
+	// Load environment variables from .env
+	psHost := os.Getenv("POSTGRES_HOST")
+	psPort := os.Getenv("POSTGRES_PORT")
+	psUser := os.Getenv("POSTGRES_USER")
+	psPassword := os.Getenv("POSTGRES_PASSWORD")
+	psDatabase := os.Getenv("POSTGRES_DATABASE")
+	keyFile := os.Getenv("KEY_PATH")
+
+	// Get postgres DB connection
+	psPortInt, err := strconv.Atoi(psPort)
+	_, err = libraries.GetPostgresClient(psHost, psPortInt, psUser, psPassword, psDatabase)
 	if err != nil {
 		panic(err)
 	}
@@ -55,7 +64,7 @@ func main() {
 	results := make(chan string, 10)
 	timeout := time.After(30 * time.Second)
 
-	pemBytes, err := ioutil.ReadFile(os.Getenv("HOME") + *keyFile)
+	pemBytes, err := ioutil.ReadFile(os.Getenv("HOME") + keyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
