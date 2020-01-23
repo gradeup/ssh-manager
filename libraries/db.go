@@ -53,10 +53,30 @@ func getDb(psHost string, psPort int, psUser string, psPassword string, psDataba
 }
 
 func createTables(db *sql.DB) error {
+
+	createUserTableStatement := "CREATE TABLE IF NOT EXISTS users (id serial PRIMARY KEY, username VARCHAR (50) NOT NULL, email VARCHAR (100) NOT NULL, public_key TEXT NOT NULL, created_at timestamp);"
+	_, err := db.Exec(createUserTableStatement)
+	if err != nil {
+		return err
+	}
+
+	createServerTableStatement := "CREATE TABLE IF NOT EXISTS servers (id serial PRIMARY KEY, ip VARCHAR (50) NOT NULL, username VARCHAR (50) NOT NULL, created_at timestamp);"
+	_, err = db.Exec(createServerTableStatement)
+	if err != nil {
+		return err
+	}
+
+	createPivotTableStatement := "CREATE TABLE IF NOT EXISTS user_server (user_id integer not null, server_id integer not null, grant_date timestamp, PRIMARY KEY (user_id, server_id), CONSTRAINT user_id_fk FOREIGN KEY (user_id) REFERENCES users (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION, CONSTRAINT server_id_fk FOREIGN KEY (server_id) REFERENCES servers (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION);"
+	_, err = db.Exec(createPivotTableStatement)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func seedData(db *sql.DB) error {
+	// Nothing to seed as of now
 	return nil
 }
 
