@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 
 	"golang.org/x/crypto/ssh"
@@ -54,8 +55,8 @@ func main() {
 	psPassword := os.Getenv("POSTGRES_PASSWORD")
 	psDatabase := os.Getenv("POSTGRES_DATABASE")
 	privateKeyFile := os.Getenv("PRIVATE_KEY_PATH")
-	// publicKeyFile := os.Getenv("PUBLIC_KEY_PATH")
-	_ = os.Getenv("PUBLIC_KEY_PATH")
+	publicKeyFile := os.Getenv("PUBLIC_KEY_PATH")
+	// _ = os.Getenv("PUBLIC_KEY_PATH")
 
 	// Get postgres DB connection
 	psPortInt, err := strconv.Atoi(psPort)
@@ -64,8 +65,12 @@ func main() {
 		panic(err)
 	}
 
-	http.HandleFunc("/", apis.HomePage)
-	http.ListenAndServe(":"+servicePort, nil)
+	mux := http.NewServeMux()
+	mux.Handle("/", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.HomePage(w, r, publicKeyFile)
+	})))
+	log.Println("Server started at :" + servicePort)
+	log.Fatal(http.ListenAndServe(":"+servicePort, handlers.RecoveryHandler()(mux)))
 
 	cmd := "ls"
 	hosts := []string{}
