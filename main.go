@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
+	"sshmanager/apis"
 	"sshmanager/libraries"
 	"strconv"
 	"time"
@@ -48,9 +50,12 @@ func main() {
 	psHost := os.Getenv("POSTGRES_HOST")
 	psPort := os.Getenv("POSTGRES_PORT")
 	psUser := os.Getenv("POSTGRES_USER")
+	servicePort := os.Getenv("SERVICE_PORT")
 	psPassword := os.Getenv("POSTGRES_PASSWORD")
 	psDatabase := os.Getenv("POSTGRES_DATABASE")
-	keyFile := os.Getenv("KEY_PATH")
+	privateKeyFile := os.Getenv("PRIVATE_KEY_PATH")
+	// publicKeyFile := os.Getenv("PUBLIC_KEY_PATH")
+	_ = os.Getenv("PUBLIC_KEY_PATH")
 
 	// Get postgres DB connection
 	psPortInt, err := strconv.Atoi(psPort)
@@ -59,12 +64,15 @@ func main() {
 		panic(err)
 	}
 
+	http.HandleFunc("/", apis.HomePage)
+	http.ListenAndServe(":"+servicePort, nil)
+
 	cmd := "ls"
 	hosts := []string{}
 	results := make(chan string, 10)
 	timeout := time.After(30 * time.Second)
 
-	pemBytes, err := ioutil.ReadFile(os.Getenv("HOME") + keyFile)
+	pemBytes, err := ioutil.ReadFile(os.Getenv("HOME") + privateKeyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
