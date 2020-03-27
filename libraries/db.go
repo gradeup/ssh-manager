@@ -54,13 +54,13 @@ func getDb(psHost string, psPort int, psUser string, psPassword string, psDataba
 
 func createTables(db *sql.DB) error {
 
-	createUserTableStatement := "CREATE TABLE IF NOT EXISTS users (id serial PRIMARY KEY, username VARCHAR (50) NOT NULL, email VARCHAR (100) NOT NULL, public_key TEXT NOT NULL, created_at timestamp);"
+	createUserTableStatement := "CREATE TABLE IF NOT EXISTS users (id serial PRIMARY KEY, username VARCHAR (50) UNIQUE NOT NULL, email VARCHAR (100) NOT NULL, public_key TEXT NOT NULL, created_at timestamp);"
 	_, err := db.Exec(createUserTableStatement)
 	if err != nil {
 		return err
 	}
 
-	createServerTableStatement := "CREATE TABLE IF NOT EXISTS servers (id serial PRIMARY KEY, ip VARCHAR (50) NOT NULL, username VARCHAR (50) NOT NULL, created_at timestamp);"
+	createServerTableStatement := "CREATE TABLE IF NOT EXISTS servers (id serial PRIMARY KEY, ip VARCHAR (50) UNIQUE NOT NULL, username VARCHAR (50) NOT NULL, created_at timestamp);"
 	_, err = db.Exec(createServerTableStatement)
 	if err != nil {
 		return err

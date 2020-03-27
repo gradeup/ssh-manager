@@ -2,15 +2,12 @@ package main
 
 import (
 	"bytes"
-	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"sshmanager/apis"
 	"sshmanager/libraries"
 	"strconv"
-	"time"
 
 	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
@@ -54,13 +51,13 @@ func main() {
 	servicePort := os.Getenv("SERVICE_PORT")
 	psPassword := os.Getenv("POSTGRES_PASSWORD")
 	psDatabase := os.Getenv("POSTGRES_DATABASE")
-	privateKeyFile := os.Getenv("PRIVATE_KEY_PATH")
+	_ = os.Getenv("PRIVATE_KEY_PATH")
 	publicKeyFile := os.Getenv("PUBLIC_KEY_PATH")
 	// _ = os.Getenv("PUBLIC_KEY_PATH")
 
 	// Get postgres DB connection
 	psPortInt, err := strconv.Atoi(psPort)
-	_, err = libraries.GetPostgresClient(psHost, psPortInt, psUser, psPassword, psDatabase)
+	db, err := libraries.GetPostgresClient(psHost, psPortInt, psUser, psPassword, psDatabase)
 	if err != nil {
 		panic(err)
 	}
@@ -69,43 +66,71 @@ func main() {
 	mux.Handle("/", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apis.HomePage(w, r, publicKeyFile)
 	})))
+	mux.Handle("/addUser", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.AddUser(w, r, db)
+	})))
+	mux.Handle("/getUsers", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.GetUsers(w, r, db)
+	})))
+	mux.Handle("/deleteUser", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.DeleteUser(w, r, db)
+	})))
+	mux.Handle("/addServer", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.AddServer(w, r, db)
+	})))
+	mux.Handle("/getServers", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.GetServers(w, r, db)
+	})))
+	mux.Handle("/deleteServer", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.DeleteServer(w, r, db)
+	})))
+	mux.Handle("/addAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.AddAccess(w, r, db)
+	})))
+	mux.Handle("/getAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.GetAccess(w, r, db)
+	})))
+	mux.Handle("/revokeAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.RevokeAccess(w, r, db)
+	})))
+
 	log.Println("Server started at :" + servicePort)
-	log.Fatal(http.ListenAndServe(":"+servicePort, handlers.RecoveryHandler()(mux)))
+	log.Fatal(http.ListenAndServe("localhost:"+servicePort, handlers.RecoveryHandler()(mux)))
 
-	cmd := "ls"
-	hosts := []string{}
-	results := make(chan string, 10)
-	timeout := time.After(30 * time.Second)
+	// cmd := "ls"
+	// hosts := []string{}
+	// results := make(chan string, 10)
+	// timeout := time.After(30 * time.Second)
 
-	pemBytes, err := ioutil.ReadFile(os.Getenv("HOME") + privateKeyFile)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// pemBytes, err := ioutil.ReadFile(os.Getenv("HOME") + privateKeyFile)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	signer, err := ssh.ParsePrivateKey(pemBytes)
-	if err != nil {
-		log.Fatalf("parse key failed:%v", err)
-	}
+	// signer, err := ssh.ParsePrivateKey(pemBytes)
+	// if err != nil {
+	// 	log.Fatalf("parse key failed:%v", err)
+	// }
 
-	config := &ssh.ClientConfig{
-		User:            "ubuntu",
-		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
-		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-	}
+	// config := &ssh.ClientConfig{
+	// 	User:            "ubuntu",
+	// 	Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
+	// 	HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+	// }
 
-	for _, hostname := range hosts {
-		go func(hostname string) {
-			results <- executeCmd(cmd, hostname, config)
-		}(hostname)
-	}
+	// for _, hostname := range hosts {
+	// 	go func(hostname string) {
+	// 		results <- executeCmd(cmd, hostname, config)
+	// 	}(hostname)
+	// }
 
-	for i := 0; i < len(hosts); i++ {
-		select {
-		case res := <-results:
-			fmt.Print(res)
-		case <-timeout:
-			fmt.Println("Timed out!")
-			return
-		}
-	}
+	// for i := 0; i < len(hosts); i++ {
+	// 	select {
+	// 	case res := <-results:
+	// 		fmt.Print(res)
+	// 	case <-timeout:
+	// 		fmt.Println("Timed out!")
+	// 		return
+	// 	}
+	// }
 }
