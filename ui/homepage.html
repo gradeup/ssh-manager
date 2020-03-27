@@ -1,11 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin-SSH Manager</title>
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"  media="screen,projection"/>
+    <link type="text/css" rel="stylesheet" href="/static/style.css"/>
+    
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
+
 <body>
-    <p>The date today is {{.Date}}</p>
-    <p>And the time is {{.Time}}</p>
-    <p>Public Key is {{.PublicKey}}</p>
+    <nav> 
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo center">Logo</a>
+        </div>
+    </nav>
+    
+    <ul id="slide-out" class="sidenav">
+        <li><div class="user-view">
+            <div class="background">
+                <img src="images/office.jpg">
+            </div>
+            <a href="#user"><img class="circle" src="images/yuna.jpg"></a>
+            <a href="#name"><span class="white-text name">John Doe</span></a>
+            <a href="#email"><span class="white-text email">jdandturk@gmail.com</span></a>
+        </div></li>
+        <li><a href="#!"><i class="material-icons">cloud</i>First Link With Icon</a></li>
+        <li><a href="#!">Second Link</a></li>
+        <li><div class="divider"></div></li>
+        <li><a class="subheader">Subheader</a></li>
+        <li><a class="waves-effect" href="#!">Third Link With Waves</a></li>
+    </ul>
+    <a href="#" id="sideNavIcon" data-target="slide-out" class="sidenav-trigger btn-floating btn-large waves-effect waves-light red"><i class="material-icons">menu</i></a>   
+    
+    <div class="container">
+        <p>The date today is {{.Date}}</p>
+        <p>And the time is {{.Time}}</p>
+        <p>Public Key is {{.PublicKey}}</p>
+    </div>
+    
+    <!--JavaScript at end of body for optimized loading-->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="/static/script.js"></script>
 </body>
 </html>
