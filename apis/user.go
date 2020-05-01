@@ -18,13 +18,16 @@ func AddUser(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	username := r.FormValue("username")
 	email := r.FormValue("email")
 	public_key := r.FormValue("public_key")
-	created_at := time.Now().UnixNano()
 
-	sqlStatement := `INSERT INTO users (username, email, public_key, created_at) VALUES (?, ?, ?, ?)`
-	_, err := db.Exec(sqlStatement, username, email, public_key, created_at)
+	sqlStatement := `INSERT INTO users (username, email, public_key, created_at) VALUES ($1, $2, $3, $4)`
+	_, err := db.Exec(sqlStatement, username, email, public_key, time.Now())
 	if err != nil {
-		return err
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		return nil
 	}
+	w.WriteHeader(200)
+	w.Write([]byte("User created"))
 	return nil
 }
 
