@@ -2,14 +2,25 @@ package apis
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 	"time"
+
+	"k8s.io/apimachinery/pkg/util/json"
 )
 
 type Access struct {
-	user_id    string
-	server_id  string
-	grant_date string
+	User_id    string `json:"user_id"`
+	Server_id  string `json:"server_id"`
+	Grant_date string `json:"grant_date"`
+	User       string `json:"user"`
+	Server     string `json:"server"`
+}
+
+type AccessList struct {
+	Accesses []Access `json:"accesses"`
+	Servers  []Server `json:"servers"`
+	Users    []User   `json:"users"`
 }
 
 func AddAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
@@ -25,25 +36,65 @@ func AddAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	return nil
 }
 
-func GetAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) ([]Access, error) {
-	rows, err := db.Query("SELECT * FROM user_server")
+func GetAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+	servers, err := ListServers(db)
 	if err != nil {
-		return nil, err
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		fmt.Printf("%v", err)
+		return nil
+	}
+	users, err := ListUsers(db)
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		fmt.Printf("%v", err)
+		return nil
+	}
+
+	rows, err := db.Query("SELECT us.*, u.username as user, s.username as server FROM user_server us, users u, servers s where us.user_id=u.id and us.server_id=s.id")
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		fmt.Printf("%v", err)
+		return nil
 	}
 	defer rows.Close()
 	var accesses []Access
 	for rows.Next() {
 		var access Access
-		err = rows.Scan(&access.user_id, &access.server_id, &access.grant_date)
+		err = rows.Scan(&access.User_id, &access.Server_id, &access.Grant_date, &access.User, &access.Server)
 		if err != nil {
-			return nil, err
+			w.WriteHeader(500)
+			w.Write([]byte(err.Error()))
+			fmt.Printf("%v", err)
+			return nil
 		}
+		accesses = append(accesses, access)
 	}
 	err = rows.Err()
 	if err != nil {
-		return nil, err
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		fmt.Printf("%v", err)
+		return nil
 	}
-	return accesses, nil
+
+	var accessList = AccessList{
+		Accesses: accesses,
+		Servers:  servers,
+		Users:    users,
+	}
+
+	accessListByte, err := json.Marshal(accessList)
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		return err
+	}
+	w.WriteHeader(200)
+	w.Write(accessListByte)
+	return nil
 }
 
 func RevokeAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {

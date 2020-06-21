@@ -21,10 +21,10 @@
     <ul id="slide-out" class="sidenav">
         <li><a class="waves-effect waves-light btn" id="copy_public_key" href="#"><i class="material-icons left">content_copy</i>Copy Public Key</a></li>
         <li><a class="waves-effect waves-light btn modal-trigger" href="#add_user_modal"><i class="material-icons left">add</i>Add User</a></li>
-        <li><a class="waves-effect waves-light btn"><i class="material-icons left">add</i>Add Server</a></li>
-        <li><a class="waves-effect waves-light btn"><i class="material-icons left">face</i>List Users</a></li>
-        <li><a class="waves-effect waves-light btn"><i class="material-icons left">desktop_mac</i>List Servers</a></li>
-        <li><a class="waves-effect waves-light btn"><i class="material-icons left">lock_open</i>Show Access</a></li>
+        <li><a class="waves-effect waves-light btn modal-trigger" href="#add_server_modal"><i class="material-icons left">add</i>Add Server</a></li>
+        <li><a class="waves-effect waves-light btn modal-trigger" href="#list_users_modal" id="list_users"><i class="material-icons left">face</i>List Users</a></li>
+        <li><a class="waves-effect waves-light btn modal-trigger" href="#list_servers_modal" id="list_servers"><i class="material-icons left">desktop_mac</i>List Servers</a></li>
+        <li><a class="waves-effect waves-light btn modal-trigger" href="#list_access_modal" id="list_access"><i class="material-icons left">lock_open</i>Show Access</a></li>
     </ul>
     <a href="#" id="sideNavIcon" data-target="slide-out" class="sidenav-trigger btn-floating btn-large waves-effect waves-light red"><i class="material-icons">menu</i></a>   
     
@@ -67,7 +67,96 @@
             </div>
         </div>
     </div>
-    
+
+    <!-- List Users Modal -->
+    <div id="list_users_modal" class="modal">
+        <div class="modal-content">
+            <h4>List Users</h4>
+            <div class="row">
+                <table class="striped">
+                    <thead>
+                      <tr>
+                          <th>ID</th>
+                          <th>Username</th>
+                          <th>Email</th>
+                          <th>Public Key</th>
+                          <th>Created At</th>
+                      </tr>
+                    </thead>
+            
+                    <tbody id="list_users_tbody">
+                    </tbody>
+                  </table>               
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Server Modal -->
+    <div id="add_server_modal" class="modal">
+        <div class="modal-content">
+            <h4>Add Server</h4>
+            <div class="row">
+                <form class="col s12" id="add_server_form">
+                    <div class="row">
+                        <div class="input-field col s6">
+                            <i class="material-icons prefix">account_circle</i>
+                            <input id="server_username" type="text" class="validate reset" name="username" required>
+                            <label for="server_username">Name</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <i class="material-icons prefix">email</i>
+                            <input id="server_ip" type="text" class="validate reset" name="ip" required>
+                            <label for="server_ip">Server IP</label>
+                        </div>
+                    </div>
+                    <button class="btn waves-effect waves-light right" type="submit" name="action">Submit
+                        <i class="material-icons right">send</i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- List Servers Modal -->
+    <div id="list_servers_modal" class="modal">
+        <div class="modal-content">
+            <h4>List Servers</h4>
+            <div class="row">
+                <table class="striped">
+                    <thead>
+                      <tr>
+                          <th>ID</th>
+                          <th>Name</th>
+                          <th>IP</th>
+                          <th>Created At</th>
+                      </tr>
+                    </thead>
+            
+                    <tbody id="list_servers_tbody">
+                    </tbody>
+                  </table>               
+            </div>
+        </div>
+    </div>
+
+    <!-- List Access Modal -->
+    <div id="list_access_modal" class="modal">
+        <div class="modal-content">
+            <h4>List Access</h4>
+            <div class="row">
+                <table class="striped">
+                    <thead>
+                      <tr id="list_access_headings">
+                      </tr>
+                    </thead>
+            
+                    <tbody id="list_access_tbody">
+                    </tbody>
+                  </table>               
+            </div>
+        </div>
+    </div>
+
     <!--JavaScript at end of body for optimized loading-->
     <script src="https://code.jquery.com/jquery-3.5.0.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
