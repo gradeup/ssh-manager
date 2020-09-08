@@ -103,3 +103,15 @@ func DeleteUser(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	}
 	return nil
 }
+
+func getUser(user_id int, db *sql.DB) (User, error) {
+	var user User
+	sqlStatement := "SELECT * FROM users where id = $1"
+	row := db.QueryRow(sqlStatement, user_id)
+	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.Public_key, &user.Created_at)
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
+}

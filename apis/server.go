@@ -104,3 +104,15 @@ func DeleteServer(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	}
 	return nil
 }
+
+func getServer(server_id int, db *sql.DB) (Server, error) {
+	var server Server
+	sqlStatement := "SELECT * FROM servers where id = $1"
+	row := db.QueryRow(sqlStatement, server_id)
+	err := row.Scan(&server.Id, &server.Ip, &server.Username, &server.Created_at)
+	if err != nil {
+		return server, err
+	}
+
+	return server, nil
+}

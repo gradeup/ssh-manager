@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"log"
 	"net/http"
 	"os"
@@ -11,30 +10,28 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
-
-	"golang.org/x/crypto/ssh"
 )
 
-func executeCmd(cmd, hostname string, config *ssh.ClientConfig) string {
+// func executeCmd(cmd, hostname string, config *ssh.ClientConfig) string {
 
-	conn, err := ssh.Dial("tcp", hostname+":22", config)
-	if err != nil {
-		log.Fatalf("dial failed:%v", err)
-	}
-	defer conn.Close()
-	session, err := conn.NewSession()
-	if err != nil {
-		log.Fatalf("session failed:%v", err)
-	}
-	defer session.Close()
-	var stdoutBuf bytes.Buffer
-	session.Stdout = &stdoutBuf
-	err = session.Run(cmd)
-	if err != nil {
-		log.Fatalf("Run failed:%v", err)
-	}
-	return stdoutBuf.String()
-}
+// 	conn, err := ssh.Dial("tcp", hostname+":22", config)
+// 	if err != nil {
+// 		log.Fatalf("dial failed:%v", err)
+// 	}
+// 	defer conn.Close()
+// 	session, err := conn.NewSession()
+// 	if err != nil {
+// 		log.Fatalf("session failed:%v", err)
+// 	}
+// 	defer session.Close()
+// 	var stdoutBuf bytes.Buffer
+// 	session.Stdout = &stdoutBuf
+// 	err = session.Run(cmd)
+// 	if err != nil {
+// 		log.Fatalf("Run failed:%v", err)
+// 	}
+// 	return stdoutBuf.String()
+// }
 
 func main() {
 
@@ -51,7 +48,7 @@ func main() {
 	servicePort := os.Getenv("SERVICE_PORT")
 	psPassword := os.Getenv("POSTGRES_PASSWORD")
 	psDatabase := os.Getenv("POSTGRES_DATABASE")
-	_ = os.Getenv("PRIVATE_KEY_PATH")
+	privateKeyFile := os.Getenv("PRIVATE_KEY_PATH")
 	publicKeyFile := os.Getenv("PUBLIC_KEY_PATH")
 	// _ = os.Getenv("PUBLIC_KEY_PATH")
 
@@ -86,14 +83,11 @@ func main() {
 		apis.DeleteServer(w, r, db)
 	})))
 	mux.Handle("/toggleAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		apis.ToggleAccess(w, r, db)
+		apis.ToggleAccess(w, r, db, privateKeyFile)
 	})))
 	mux.Handle("/getAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apis.GetAccess(w, r, db)
 	})))
-	// mux.Handle("/revokeAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 	apis.RevokeAccess(w, r, db)
-	// })))
 
 	log.Println("Server started at :" + servicePort)
 	log.Fatal(http.ListenAndServe("localhost:"+servicePort, handlers.RecoveryHandler()(mux)))
