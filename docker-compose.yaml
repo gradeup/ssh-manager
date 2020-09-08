@@ -1,0 +1,21 @@
+version: '3'
+services:
+  postgres:
+    image: "postgres:9.6"
+    container_name: 'sshmanagerdb'
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: "postgres"
+    volumes:
+      - ~/sshmanager/pg:/var/lib/postgresql/data
+    tty: true
+    
+  web:
+    image: "gradeup/ssh-manager:0.1"
+    container_name: 'sshmanager'
+    ports:
+      - "8000:8000"
+    volumes:
+      - ~/sshmanager/.env:/.env
+    tty: true
