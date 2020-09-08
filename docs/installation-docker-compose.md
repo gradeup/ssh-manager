@@ -1,8 +1,12 @@
 # Installation using Docker Compose
 
-- Setup a bare linux system
+- Setup a bare linux system<br>
+`sudo apt-get update`<br>
+`sudo apt-get upgrade`<br>
 - Generate new ssh key pair
-- Install Docker
+- Install Docker<br>
+`sudo apt-get install docker`<br>
+`sudo apt-get install docker-compose`<br>
 - Create sshmanager directory<br>
 `mkdir ~/sshmanager`
 `mkdir ~/sshmanager/pg`

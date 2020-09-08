@@ -90,7 +90,7 @@ func main() {
 	})))
 
 	log.Println("Server started at :" + servicePort)
-	log.Fatal(http.ListenAndServe("localhost:"+servicePort, handlers.RecoveryHandler()(mux)))
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+servicePort, handlers.RecoveryHandler()(mux)))
 
 	// cmd := "ls"
 	// hosts := []string{}
