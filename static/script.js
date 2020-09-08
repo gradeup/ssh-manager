@@ -92,6 +92,17 @@ $(document).ready(function(){
             success: function(data) {
                 console.log(data)
                 var accesslist = JSON.parse(data)
+
+                var userAccessArray = {};
+                if(accesslist.accesses) {
+                    accesslist.accesses.forEach(function (access) {
+                        if(!userAccessArray[access.user_id]) {
+                            userAccessArray[access.user_id] = []
+                        }
+                        (userAccessArray[access.user_id]).push(access.server_id);
+                    });
+                }
+                
                 $("#list_access_headings").html('<th></th>');
                 accesslist.servers.forEach(function (server) {
                         $("#list_access_headings").append('<th>'+server.username+'</th>')
@@ -102,11 +113,37 @@ $(document).ready(function(){
                     var list_access_tbody = '';
                     list_access_tbody+='<tr><td>'+user.username+'</td>'
                     accesslist.servers.forEach(function (server) {
-                        list_access_tbody+='<td>'+server.username+'</td>'
+                        if(userAccessArray[user.id] && userAccessArray[user.id].includes(server.id)) {
+                            list_access_tbody+= '<th><label><input type="checkbox" class="filled-in access-checkbox" checked="checked" data-userid="'+user.id+'" data-serverid="'+server.id+'" /><span></span></label></th>'
+                        } else {
+                            list_access_tbody+= '<th><label><input type="checkbox" class="filled-in access-checkbox" data-userid="'+user.id+'" data-serverid="'+server.id+'" /><span></span></label></th>'
+                        }
                     });
                     list_access_tbody+='</tr>'
                     $("#list_access_tbody").append(list_access_tbody);
                 });
+            },
+            error: function(error) {
+                M.toast({html: error.responseText, classes: 'red'});
+            }
+        })
+    })
+
+    $(document.body).on('click','.access-checkbox', function(e) {
+        console.log("toggled")
+        // e.preventDefault();
+        $.ajax({
+            url: '/toggleAccess',
+            data: {
+                'user_id': $(this).data('userid'),
+                'server_id': $(this).data('serverid'),
+                'access': $(this).prop("checked")
+            },
+            success: function(data) {
+                M.toast({html: data, classes: 'green'});
+                // var instance = M.Modal.getInstance($("#add_server_modal"));
+                // instance.close();
+                // reset();
             },
             error: function(error) {
                 M.toast({html: error.responseText, classes: 'red'});

@@ -85,15 +85,15 @@ func main() {
 	mux.Handle("/deleteServer", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apis.DeleteServer(w, r, db)
 	})))
-	mux.Handle("/addAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		apis.AddAccess(w, r, db)
+	mux.Handle("/toggleAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		apis.ToggleAccess(w, r, db)
 	})))
 	mux.Handle("/getAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apis.GetAccess(w, r, db)
 	})))
-	mux.Handle("/revokeAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		apis.RevokeAccess(w, r, db)
-	})))
+	// mux.Handle("/revokeAccess", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 	apis.RevokeAccess(w, r, db)
+	// })))
 
 	log.Println("Server started at :" + servicePort)
 	log.Fatal(http.ListenAndServe("localhost:"+servicePort, handlers.RecoveryHandler()(mux)))

@@ -2,8 +2,9 @@ package apis
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"k8s.io/apimachinery/pkg/util/json"
@@ -23,16 +24,46 @@ type AccessList struct {
 	Users    []User   `json:"users"`
 }
 
-func AddAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
+func ToggleAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	user_id := r.FormValue("user_id")
 	server_id := r.FormValue("server_id")
-	grant_date := time.Now().UnixNano()
+	access := r.FormValue("access")
+	grant_date := time.Now()
 
-	sqlStatement := `INSERT INTO user_server (user_id, server_id, grant_date) VALUES (?, ?, ?)`
-	_, err := db.Exec(sqlStatement, user_id, server_id, grant_date)
+	user_id_int, err := strconv.Atoi(user_id)
 	if err != nil {
-		return err
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		log.Printf("%v", err)
+		return nil
 	}
+
+	server_id_int, err := strconv.Atoi(server_id)
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		log.Printf("%v", err)
+		return nil
+	}
+
+	if access == "true" {
+		sqlStatement := `INSERT INTO user_server(user_id, server_id, grant_date) VALUES ($1, $2, $3)`
+		log.Printf(sqlStatement)
+		_, err = db.Exec(sqlStatement, user_id_int, server_id_int, grant_date)
+	} else {
+		sqlStatement := `DELETE FROM user_server where user_id = $1 and server_id = $2`
+		log.Printf(sqlStatement)
+		_, err = db.Exec(sqlStatement, user_id_int, server_id_int)
+	}
+
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		log.Printf("%v", err)
+		return nil
+	}
+	w.WriteHeader(200)
+	w.Write([]byte("Access modified!"))
 	return nil
 }
 
@@ -41,14 +72,14 @@ func GetAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	if err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
-		fmt.Printf("%v", err)
+		log.Printf("%v", err)
 		return nil
 	}
 	users, err := ListUsers(db)
 	if err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
-		fmt.Printf("%v", err)
+		log.Printf("%v", err)
 		return nil
 	}
 
@@ -56,7 +87,7 @@ func GetAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	if err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
-		fmt.Printf("%v", err)
+		log.Printf("%v", err)
 		return nil
 	}
 	defer rows.Close()
@@ -67,7 +98,7 @@ func GetAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		if err != nil {
 			w.WriteHeader(500)
 			w.Write([]byte(err.Error()))
-			fmt.Printf("%v", err)
+			log.Printf("%v", err)
 			return nil
 		}
 		accesses = append(accesses, access)
@@ -76,7 +107,7 @@ func GetAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	if err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
-		fmt.Printf("%v", err)
+		log.Printf("%v", err)
 		return nil
 	}
 
@@ -94,17 +125,5 @@ func GetAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	}
 	w.WriteHeader(200)
 	w.Write(accessListByte)
-	return nil
-}
-
-func RevokeAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
-	user_id := r.FormValue("user_id")
-	server_id := r.FormValue("server_id")
-
-	sqlStatement := `DELETE FROM user_server where user_id = ? and server_id = ?`
-	_, err := db.Exec(sqlStatement, user_id, server_id)
-	if err != nil {
-		return err
-	}
 	return nil
 }

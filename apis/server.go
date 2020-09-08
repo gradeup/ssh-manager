@@ -2,7 +2,7 @@ package apis
 
 import (
 	"database/sql"
-	"fmt"
+	"log"
 	"net/http"
 	"time"
 
@@ -25,7 +25,7 @@ func AddServer(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	if err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
-		fmt.Printf("%v", err)
+		log.Printf("%v", err)
 		return nil
 	}
 	w.WriteHeader(200)
@@ -60,7 +60,7 @@ func GetServers(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	if err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
-		fmt.Printf("%v", err)
+		log.Printf("%v", err)
 		return nil
 	}
 	defer rows.Close()
@@ -71,7 +71,7 @@ func GetServers(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		if err != nil {
 			w.WriteHeader(500)
 			w.Write([]byte(err.Error()))
-			fmt.Printf("%v", err)
+			log.Printf("%v", err)
 			return nil
 		}
 		servers = append(servers, server)
@@ -80,7 +80,7 @@ func GetServers(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	if err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
-		fmt.Printf("%v", err)
+		log.Printf("%v", err)
 		return nil
 	}
 	serversByte, err := json.Marshal(servers)
