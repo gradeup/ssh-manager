@@ -21,6 +21,7 @@
 - Implement CSRF tokens
 - Add option to use single user instances or create seperate users on instances
 - Pick instance username from servers (if single user machine), else use user's name
+- Add Listen Address from env (0.0.0.0 or 127.0.0.1 or some private IP)
 
 ---
 

@@ -197,7 +197,12 @@ func executeCmd(cmd, hostname string, config *ssh.ClientConfig) Result {
 
 func updateAccess(user User, server Server, access bool, privateKeyFile string) error {
 
-	cmd := "ls"
+	var cmd string
+	if access == true {
+		cmd = "echo '" + user.Public_key + " " + user.Email + "' >> /home/ubuntu/.ssh/authorized_keys"
+	} else {
+		cmd = "sed -i -n '/" + user.Email + "/!p' /home/ubuntu/.ssh/authorized_keys"
+	}
 	results := make(chan Result, 5)
 	timeout := time.After(30 * time.Second)
 
