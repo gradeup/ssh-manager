@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -50,6 +53,8 @@ func main() {
 	psDatabase := os.Getenv("POSTGRES_DATABASE")
 	privateKeyFile := os.Getenv("PRIVATE_KEY_PATH")
 	publicKeyFile := os.Getenv("PUBLIC_KEY_PATH")
+	githubClientId := os.Getenv("GITHUB_CLIENT_ID")
+	githubClientSecret := os.Getenv("GITHUB_CLIENT_SECRET")
 	// _ = os.Getenv("PUBLIC_KEY_PATH")
 
 	// Get postgres DB connection
@@ -64,6 +69,15 @@ func main() {
 		apis.HomePage(w, r, publicKeyFile)
 	})))
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+	mux.Handle("/login/github", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		githubLoginHandler(w, r, db)
+	})))
+	mux.Handle("/login/github/callback", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		githubCallbackHandler(w, r, db)
+	})))
+	mux.Handle("/loggedin", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		loggedinHandler(w, r, db)
+	})))
 	mux.Handle("/addUser", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apis.AddUser(w, r, db)
 	})))
@@ -128,4 +142,40 @@ func main() {
 	// 		return
 	// 	}
 	// }
+
+}
+
+func loggedinHandler(w http.ResponseWriter, r *http.Request, githubData string) {
+	if githubData == "" {
+		fmt.Fprintf(w, "UNAUTHORIZED!")
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	var prettyJSON bytes.Buffer
+
+	parseerr := json.Indent(&prettyJSON, []byte(githubData), "", "\t")
+	if parseerr != nil {
+		log.Printf("JSON Parse Error")
+	}
+
+	fmt.Fprintf(w, string(prettyJSON.Bytes()))
+}
+
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, `<a href="/login/github/">LOGIN</a>`)
+}
+
+func githubLoginHandler(w http.ResponseWriter, r *http.Request) {
+	redirectURL := fmt.Sprintf("https://github.com/login/oauth/authorize?client_id=%s&redirect_uri=%s", githubClientId, "http://localhost:3000/login/github/callback")
+
+	http.Redirect(w, r, redirectURL, 301)
+}
+
+func githubCallbackHandler(w http.ResponseWriter, r *http.Request) {
+	code := r.URL.Query().Get("code")
+	githubAccessToken := getGithubAccessToken(code)
+	githubData := getGithubData(githubAccessToken)
+	loggedinHandler(w, r, githubData)
 }

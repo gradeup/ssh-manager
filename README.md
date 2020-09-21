@@ -24,9 +24,9 @@
 - POSTGRES_DATABASE=sshmanager<br>
   `Database used for ssh manager in postgres, defaults to postgres`
 - PRIVATE_KEY_PATH=/.ssh/id_rsa<br>
-  `Path to private key which has access to all servers that will be managed by this service, the path is prefixed with $HOME by service internally, defaults to /.ssh/id_rsa`
+  `Path to private key which has access to all servers that will be managed by this service, defaults to home/ubuntu/.ssh/id_rsa`
 - PUBLIC_KEY_PATH=/.ssh/id_rsa.pub<br>
-  `Path to public key which needs to be available on all instances to be managed by this service, the path is prefixed with $HOME by service internally, defaults to /.ssh/id_rsa.pub`
+  `Path to public key which needs to be available on all instances to be managed by this service, defaults to home/ubuntu/.ssh/id_rsa.pub`
 - SERVICE_PORT=8000<br>
   `Port to start ssh-manager web service on, defaults to 8000`
 

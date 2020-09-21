@@ -2,11 +2,10 @@ package libraries
 
 import (
 	"io/ioutil"
-	"os"
 )
 
 func ReadFile(path string) (string, error) {
-	bytes, err := ioutil.ReadFile(os.Getenv("HOME") + path)
+	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
 		return "", err
 	}

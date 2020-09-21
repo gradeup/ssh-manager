@@ -6,5 +6,8 @@ RUN go build -o ssh-manager
 
 FROM alpine:latest
 RUN mkdir ssh-manager
-COPY --from=builder /go/ssh-manager/ssh-manager /go/ssh-manager/static /go/ssh-manager/ui /ssh-manager/
-CMD ["/ssh-manager/ssh-manager"]
+WORKDIR /ssh-manager
+COPY --from=builder /go/ssh-manager/ssh-manager /ssh-manager/
+COPY --from=builder /go/ssh-manager/static /ssh-manager/static/
+COPY --from=builder /go/ssh-manager/ui /ssh-manager/ui/
+CMD ["./ssh-manager"]
