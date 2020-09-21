@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strconv"
 	"time"
 
@@ -206,7 +205,7 @@ func updateAccess(user User, server Server, access bool, privateKeyFile string) 
 	results := make(chan Result, 5)
 	timeout := time.After(30 * time.Second)
 
-	pemBytes, err := ioutil.ReadFile(os.Getenv("HOME") + privateKeyFile)
+	pemBytes, err := ioutil.ReadFile(privateKeyFile)
 	if err != nil {
 		log.Fatal(err)
 	}
