@@ -93,17 +93,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	return nil
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
-	username := r.FormValue("username")
-
-	sqlStatement := `DELETE FROM users where username = ?`
-	_, err := db.Exec(sqlStatement, username)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
 func getUser(user_id int, db *sql.DB) (User, error) {
 	var user User
 	sqlStatement := "SELECT * FROM users where id = $1"

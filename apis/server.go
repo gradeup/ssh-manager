@@ -95,13 +95,19 @@ func GetServers(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 }
 
 func DeleteServer(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
-	username := r.FormValue("username")
+	server_id := r.FormValue("server_id")
 
-	sqlStatement := `DELETE FROM servers where username = ?`
-	_, err := db.Exec(sqlStatement, username)
+	sqlStatement := `DELETE FROM servers where id = $1`
+	_, err := db.Exec(sqlStatement, server_id)
 	if err != nil {
-		return err
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		log.Printf("%v", err)
+		return nil
 	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("Server Deleted!"))
 	return nil
 }
 

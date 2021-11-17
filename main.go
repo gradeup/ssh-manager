@@ -71,7 +71,7 @@ func main() {
 		apis.GetUsers(w, r, db)
 	})))
 	mux.Handle("/deleteUser", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		apis.DeleteUser(w, r, db)
+		apis.DeleteUser(w, r, db, privateKeyFile)
 	})))
 	mux.Handle("/addServer", handlers.LoggingHandler(os.Stdout, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		apis.AddServer(w, r, db)

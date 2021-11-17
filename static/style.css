@@ -3,3 +3,8 @@
     top: 30px;
     left: 30px;
 }
+
+.modal.bottom-sheet {
+    max-height: 90%;
+    height: 90%;
+}

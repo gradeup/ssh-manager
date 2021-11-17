@@ -66,7 +66,7 @@ func createTables(db *sql.DB) error {
 		return err
 	}
 
-	createPivotTableStatement := "CREATE TABLE IF NOT EXISTS user_server (user_id integer not null, server_id integer not null, grant_date timestamp, PRIMARY KEY (user_id, server_id), CONSTRAINT user_id_fk FOREIGN KEY (user_id) REFERENCES users (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION, CONSTRAINT server_id_fk FOREIGN KEY (server_id) REFERENCES servers (id) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE NO ACTION);"
+	createPivotTableStatement := "CREATE TABLE IF NOT EXISTS user_server (user_id integer not null, server_id integer not null, grant_date timestamp, PRIMARY KEY (user_id, server_id), CONSTRAINT user_id_fk FOREIGN KEY (user_id) REFERENCES users (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE, CONSTRAINT server_id_fk FOREIGN KEY (server_id) REFERENCES servers (id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE);"
 	_, err = db.Exec(createPivotTableStatement)
 	if err != nil {
 		return err
