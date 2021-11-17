@@ -95,6 +95,41 @@ func ToggleAccess(w http.ResponseWriter, r *http.Request, db *sql.DB, privateKey
 	return nil
 }
 
+func DeleteUser(w http.ResponseWriter, r *http.Request, db *sql.DB, privateKeyFile string) error {
+	user_id := r.FormValue("user_id")
+
+	user_id_int, err := strconv.Atoi(user_id)
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		log.Printf("%v", err)
+		return nil
+	}
+
+	// Get user's public key
+	user, err := getUser(user_id_int, db)
+
+	// Get all server's IP address
+	servers, err := ListServers(db)
+
+	for _, server := range servers {
+		err = updateAccess(user, server, false, privateKeyFile)
+	}
+
+	sqlStatement := `DELETE FROM users where id = $1`
+	_, err = db.Exec(sqlStatement, user_id)
+	if err != nil {
+		w.WriteHeader(500)
+		w.Write([]byte(err.Error()))
+		log.Printf("%v", err)
+		return nil
+	}
+
+	w.WriteHeader(200)
+	w.Write([]byte("User Deleted!"))
+	return nil
+}
+
 func GetAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	servers, err := ListServers(db)
 	if err != nil {

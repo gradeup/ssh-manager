@@ -2,7 +2,6 @@ package apis
 
 import (
 	"database/sql"
-	"log"
 	"net/http"
 	"time"
 
@@ -91,23 +90,6 @@ func GetUsers(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 	}
 	w.WriteHeader(200)
 	w.Write(usersByte)
-	return nil
-}
-
-func DeleteUser(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
-	user_id := r.FormValue("user_id")
-
-	sqlStatement := `DELETE FROM users where id = $1`
-	_, err := db.Exec(sqlStatement, user_id)
-	if err != nil {
-		w.WriteHeader(500)
-		w.Write([]byte(err.Error()))
-		log.Printf("%v", err)
-		return nil
-	}
-
-	w.WriteHeader(200)
-	w.Write([]byte("User Deleted!"))
 	return nil
 }
 
