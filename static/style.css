@@ -8,3 +8,7 @@
     max-height: 90%;
     height: 90%;
 }
+
+.overflow-hidden {
+    overflow: hidden;
+}
