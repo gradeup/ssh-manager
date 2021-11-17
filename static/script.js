@@ -61,9 +61,9 @@ $(document).ready(function(){
                         <td>'+user.id+'</td>\
                         <td>'+user.username+'</td>\
                         <td>'+user.email+'</td>\
-                        <td>'+user.public_key+'</td>\
                         <td>'+user.created_at+'</td>\
                         <td><button class="btn waves-effect waves-light red delete_user_button" type="submit" data-userid="'+user.id+'">Delete<i class="material-icons right">delete</i></button></td>\
+                        <td>'+user.public_key+'</td>\
                         </tr>')
                 });
                 
