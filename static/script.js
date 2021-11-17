@@ -82,7 +82,13 @@ $(document).ready(function(){
                 var servers = JSON.parse(data)
                 $("#list_servers_tbody").html('');
                 servers.forEach(function (server) {
-                    $("#list_servers_tbody").append('<tr><td>'+server.id+'</td><td>'+server.username+'</td><td>'+server.ip+'</td><td>'+server.created_at+'</td></tr>')
+                    $("#list_servers_tbody").append('<tr>\
+                    <td>'+server.id+'</td>\
+                    <td>'+server.username+'</td>\
+                    <td>'+server.ip+'</td>\
+                    <td>'+server.created_at+'</td>\
+                    <td><button class="btn waves-effect waves-light red delete_server_button" type="submit" data-serverid="'+server.id+'">Delete<i class="material-icons right">delete</i></button></td>\
+                    </tr>')
                 });
                 
             },
@@ -147,6 +153,23 @@ $(document).ready(function(){
             success: function(data) {
                 M.toast({html: data, classes: 'green'});
                 $("#list_users").click();
+            },
+            error: function(error) {
+                M.toast({html: error.responseText, classes: 'red'});
+            }
+        })
+    })    
+
+    $(document.body).on('click','.delete_server_button', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: '/deleteServer',
+            data: {
+                'server_id': $(this).data('serverid')
+            },
+            success: function(data) {
+                M.toast({html: data, classes: 'green'});
+                $("#list_servers").click();
             },
             error: function(error) {
                 M.toast({html: error.responseText, classes: 'red'});
