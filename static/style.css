@@ -12,3 +12,10 @@
 .overflow-hidden {
     overflow: hidden;
 }
+
+thead {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2;
+}
