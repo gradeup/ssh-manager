@@ -1,0 +1,25 @@
+version: 2.1
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.15
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.7
+      - run: |
+          docker build -t gradeup/ssh-manager:$CIRCLE_TAG .
+          echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+          docker push gradeup/ssh-manager:$CIRCLE_TAG
+workflows:
+ build:
+  jobs:
+    - build:
+       filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /.*/
