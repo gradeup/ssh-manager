@@ -146,7 +146,7 @@ func GetAccess(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 		return nil
 	}
 
-	rows, err := db.Query("SELECT us.*, u.username as user, s.username as server FROM user_server us, users u, servers s where us.user_id=u.id and us.server_id=s.id")
+	rows, err := db.Query("SELECT us.*, u.username as user, s.username as server FROM user_server us, users u, servers s where us.user_id=u.id and us.server_id=s.id order by u.username desc")
 	if err != nil {
 		w.WriteHeader(500)
 		w.Write([]byte(err.Error()))
