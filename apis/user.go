@@ -34,7 +34,7 @@ func AddUser(w http.ResponseWriter, r *http.Request, db *sql.DB) error {
 }
 
 func ListUsers(db *sql.DB) ([]User, error) {
-	rows, err := db.Query("SELECT * FROM users")
+	rows, err := db.Query("SELECT * FROM users order by username desc")
 	if err != nil {
 		return nil, err
 	}
