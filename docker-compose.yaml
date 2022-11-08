@@ -10,12 +10,16 @@ services:
     volumes:
       - ~/sshmanager/pg:/var/lib/postgresql/data
     tty: true
+    restart: always
     
   web:
-    image: "gradeup/ssh-manager:0.1"
+    image: "gradeup/ssh-manager:0.8"
     container_name: 'sshmanager'
     ports:
       - "8000:8000"
     volumes:
-      - ~/sshmanager/.env:/.env
+      - ~/sshmanager/.env:/ssh-manager/.env
+      - ~/.ssh/id_rsa.pub:/ssh-manager/id_rsa.pub
+      - ~/.ssh/id_rsa:/ssh-manager/id_rsa
     tty: true
+    restart: always

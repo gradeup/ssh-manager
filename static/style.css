@@ -19,3 +19,7 @@ thead {
     background: white;
     z-index: 2;
 }
+
+#list_access_headings th {
+    writing-mode: vertical-lr;
+}

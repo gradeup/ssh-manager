@@ -31,9 +31,11 @@
   `Port to start ssh-manager web service on, defaults to 8000`
 
 ## Steps for local setup
+- Start a local postgres server (via docker/native installation as a service)
 - $ `cp .env.example .env`
-- modify .env variables as per configuration
+- Modify .env variables as per configuration
 - $ `go run main.go`
+- Head over to [http://localhost:8000](`http://localhost:8000`)
 
 ## TODOs
 - Use POST requests for modifying data
