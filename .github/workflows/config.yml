@@ -1,7 +1,7 @@
 on:
   push:
-    tags:
-      - '*'
+    branch:
+      - actions1
 
 jobs:
   deploy_by_release:
