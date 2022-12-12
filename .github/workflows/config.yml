@@ -25,4 +25,4 @@ jobs:
         run: |
           docker build -t "gradeup/ssh-manager:${{ github.ref_name }}" --build-arg="GITHUB_TOKEN=${{ secrets.TOKEN_GIT }}" .
           echo ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }} | docker login -u ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
-          docker push "gradeup/ssh-manager:${{ github.ref_name }}"
+          docker push "gradeup/ssh-manager:${{ github.ref_name }}""
