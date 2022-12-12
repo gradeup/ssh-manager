@@ -4,7 +4,7 @@ on:
       - '*'
 
 jobs:
-  deploy_by_release:
+  deploy_by_tag:
     name: Release Branch Deploy
     runs-on: ubuntu-latest
     steps:
