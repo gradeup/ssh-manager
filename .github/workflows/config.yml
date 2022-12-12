@@ -1,7 +1,7 @@
 on:
   push:
-    branches:
-      - actions1
+    tags:
+      - '*'
 
 jobs:
   deploy_by_release:
@@ -17,7 +17,7 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build, tag, and push image to Amazon ECR
+      - name: Build, tag, and push to docker hub
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: photon/app
