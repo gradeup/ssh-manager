@@ -251,8 +251,22 @@ func updateAccess(user User, server Server, access bool, privateKeyFile string) 
 	}
 
 	config := &ssh.ClientConfig{
-		User:            "ubuntu",
-		Auth:            []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		User: "ubuntu",
+		Auth: []ssh.AuthMethod{ssh.PublicKeys(signer)},
+		Config: ssh.Config{
+			KeyExchanges: []string{"diffie-hellman-group-exchange-sha256",
+				"curve25519-sha256@libssh.org ecdh-sha2-nistp256",
+				"ecdh-sha2-nistp384 ecdh-sha2-nistp521",
+				"diffie-hellman-group14-sha1",
+				"diffie-hellman-group1-sha1",
+				"aes128-ctr",
+				"aes192-ctr",
+				"aes256-ctr",
+				"arcfour256",
+				"arcfour128",
+				"arcfour",
+			},
+		},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
